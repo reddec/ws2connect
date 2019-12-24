@@ -31,7 +31,7 @@ jobs:
     - name: Upload to bintray
       env:
         UPLOAD_BINTRAY_PASSWORD: ${{ secrets.UPLOAD_BINTRAY_PASSWORD }}
-        DISTRIBUTION: trusty,xenial,bionic,buster,wheezy
+        DISTRIBUTION: "trusty,xenial,bionic,buster,wheezy"
         USERNAME: reddec
       run: |
         for package in $(ls dist/*linux*.deb); do
@@ -39,5 +39,5 @@ jobs:
           component=$(echo $name | awk -F_  '{print $1}')
           arch=$(echo $package | sed s/.deb// | awk -F_  '{print $NF}')
           echo "component: $component; arch: $arch"
-          curl -f -s -T "$package" -u "${USERNAME}:${UPLOAD_BINTRAY_PASSWORD}" "https://api.bintray.com/content/reddec/ws2connect-debian/${component}/${GITHUB_REF##*/}/${name}?publish=1;deb_component=main;deb_distribution=${DISTRIBUTION};deb_architecture=${arch}"
+          curl -f -s -T "$package" -u "${USERNAME}:${UPLOAD_BINTRAY_PASSWORD}" "https://api.bintray.com/content/reddec/ws2connect-debian/${component}/${GITHUB_REF##*/}/${name};deb_distribution=${DISTRIBUTION};deb_component=main;deb_architecture=${arch};publish=1"
         done
