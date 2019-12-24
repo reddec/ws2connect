@@ -69,7 +69,7 @@ ws2connect --tls /ws:example.com:9823
 
 ### Binary
 
-* From [releases](releases) page
+* From [releases](https://github.com/reddec/ws2connect/releases) page
 * From bintray repository for most debian-based distribution (trusty, xenial, bionic, buster, wheezy):
 ```bash
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61
