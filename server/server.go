@@ -9,17 +9,20 @@ import (
 	"time"
 )
 
+// Endpoint definition that contains remote address (with port) and protocol (supported by Go Dial function)
 type Endpoint struct {
-	Path     string
-	Address  string
-	Protocol string
+	Path     string // front HTTP binding path (ex: /ws)
+	Address  string // remote address with host and port (if applicable)
+	Protocol string // protocol type: tcp, udp, unix
 }
 
+// Configuration for HTTP WS reverse proxy to multiple backend
 type Config struct {
-	Endpoints []Endpoint
-	Timeout   time.Duration
+	Endpoints []Endpoint    // endpoint configuration (to where connection will be established)
+	Timeout   time.Duration // connection timeout
 }
 
+// Create HTTP handler with internal mapping of exported path and remote addresses
 func (c Config) Create() http.Handler {
 	mux := http.NewServeMux()
 	for _, ep := range c.Endpoints {
