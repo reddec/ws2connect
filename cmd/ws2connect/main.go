@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+var version string = "dev"
+
 var config struct {
 	Binding          string        `short:"b" long:"binding" env:"BINDING" description:"HTTP binding address" default:":8080"`
 	Timeout          time.Duration `short:"t" long:"timeout" env:"TIMEOUT" description:"Backend connection timeout" default:"15s"`
@@ -28,7 +30,9 @@ var config struct {
 }
 
 func main() {
-	_, err := flags.Parse(&config)
+	parser := flags.NewParser(&config, flags.Default)
+	parser.LongDescription = "Expose any TCP service over websocket\nAuthor: Baryshnikov Aleksandr <dev@baryshnikov.net>\nVersion: " + version
+	_, err := parser.Parse()
 	if err != nil {
 		os.Exit(1)
 	}
