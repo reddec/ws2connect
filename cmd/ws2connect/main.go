@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/jessevdk/go-flags"
 	"github.com/reddec/ws2connect/server"
+	"github.com/rs/cors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -20,6 +21,7 @@ var config struct {
 	CertFile         string        `long:"cert-file" env:"CERT_FILE" description:"Path to certificate for TLS" default:"server.crt"`
 	KeyFile          string        `long:"key-file" env:"KEY_FILE" description:"Path to private key for TLS" default:"server.key"`
 	Quiet            bool          `short:"q" long:"quiet" env:"QUIET" description:"Disable logging"`
+	CORS             bool          `long:"cors" env:"CORS" description:"Enable CORS for HTTP server"`
 	Args             struct {
 		Endpoint map[string]string `positional-arg-name:"endpoints" env:"ENDPOINT" description:"Endpoint mapping (/path:address)" default:"/:127.0.0.1:12345" env-delim:";" required:"yes"`
 	} `positional-args:"yes"`
@@ -55,9 +57,14 @@ func run() error {
 		Timeout:   config.Timeout,
 	}
 
+	var handler = cfg.Create()
+	if config.CORS {
+		handler = cors.AllowAll().Handler(handler)
+	}
+
 	srv := http.Server{
 		Addr:    config.Binding,
-		Handler: cfg.Create(),
+		Handler: handler,
 	}
 	log.Println("server started on", config.Binding)
 	go func() {

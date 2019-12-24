@@ -14,7 +14,7 @@ Expose any TCP service over websocket.
 * Blazing fast
 * Supports multiple endpoints with multiple mappings
 * Supports TLS (HTTPS) serving
-
+* Optional CORS for local developing
 
 ## Examples
 
@@ -56,6 +56,7 @@ ws2connect --tls /ws:example.com:9823
           --cert-file=         Path to certificate for TLS (default: server.crt) [$CERT_FILE]
           --key-file=          Path to private key for TLS (default: server.key) [$KEY_FILE]
       -q, --quiet              Disable logging [$QUIET]
+          --cors               Enable CORS for HTTP server [$CORS]
     
     Help Options:
       -h, --help               Show this help message
