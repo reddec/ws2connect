@@ -9,7 +9,7 @@
 Expose any TCP service over websocket. 
 
 * Single binary
-* Pre-built for all major OS (see installation)
+* Pre-built for all major OS (see [installation](#installation))
 * Few resource consumption
 * Blazing fast
 * Supports multiple endpoints with multiple mappings
