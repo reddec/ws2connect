@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"errors"
+	auth "github.com/abbot/go-http-auth"
+	"github.com/foomo/htpasswd"
 	"github.com/jessevdk/go-flags"
 	"github.com/reddec/ws2connect/server"
 	"github.com/rs/cors"
@@ -25,7 +28,12 @@ var config struct {
 	Quiet            bool          `short:"q" long:"quiet" env:"QUIET" description:"Disable logging"`
 	CORS             bool          `long:"cors" env:"CORS" description:"Enable CORS for HTTP server"`
 	Dynamic          string        `short:"d" long:"dynamic" env:"DYNAMIC" description:"Dynamic endpoint mapping path"`
-	Args             struct {
+	Authorization    struct {
+		Kind     string `short:"k" long:"kind" env:"KIND" description:"Authorization kind" default:"none" choice:"none" choice:"basic" choice:"digest"`
+		Realm    string `long:"realm" env:"REALM" description:"Name of authorization zone" default:"Restricted zone"`
+		Htpasswd string `short:"p" long:"htpasswd" env:"HTPASSWD" description:"Path to htpasswd (bcrypt or sha) file for user authorization"`
+	} `group:"Authorization" namespace:"auth" env-namespace:"AUTH"`
+	Args struct {
 		Endpoint map[string]string `positional-arg-name:"endpoints" env:"ENDPOINT" description:"Endpoint mapping (/path:address)" default:"/:127.0.0.1:12345" env-delim:";"`
 	} `positional-args:"yes"`
 }
@@ -72,6 +80,13 @@ func run() error {
 	}
 
 	var handler http.Handler = mux
+	if config.Authorization.Kind != "none" {
+		wrapped, err := wrapAuthProxy(handler)
+		if err != nil {
+			return err
+		}
+		handler = wrapped
+	}
 	if config.CORS {
 		handler = cors.AllowAll().Handler(handler)
 	}
@@ -93,4 +108,37 @@ func run() error {
 		return srv.ListenAndServeTLS(config.CertFile, config.KeyFile)
 	}
 	return srv.ListenAndServe()
+}
+
+func wrapAuthProxy(handler http.Handler) (http.Handler, error) {
+	authData, err := htpasswd.ParseHtpasswdFile(config.Authorization.Htpasswd)
+	if err != nil {
+		return nil, err
+	}
+	var wrapped http.Handler
+	switch config.Authorization.Kind {
+	case "basic":
+		wrapped = auth.NewBasicAuthenticator(config.Authorization.Realm, lookupUserMap(authData)).Wrap(wrapAuthRequest(handler))
+	case "digest":
+		wrapped = auth.NewDigestAuthenticator(config.Authorization.Realm, lookupUserMap(authData)).Wrap(wrapAuthRequest(handler))
+	default:
+		return nil, errors.New("unknown authorization kind " + config.Authorization.Kind)
+	}
+	return wrapped, nil
+}
+
+func wrapAuthRequest(handler http.Handler) auth.AuthenticatedHandlerFunc {
+	return func(writer http.ResponseWriter, request *auth.AuthenticatedRequest) {
+		handler.ServeHTTP(writer, &request.Request)
+	}
+}
+
+func lookupUserMap(authData map[string]string) auth.SecretProvider {
+	return func(user, realm string) string {
+		passwd, ok := authData[user]
+		if !ok {
+			return ""
+		}
+		return passwd
+	}
 }
