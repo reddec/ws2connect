@@ -15,7 +15,7 @@ Expose any TCP service over websocket.
 * Supports multiple endpoints with multiple mappings
 * Supports dynamic and static endpoint mappings
 * Supports TLS (HTTPS) serving
-* Optional CORS for local developing
+* Optional Basic or Digest authorization with encrypted (bcrypt or sha) httpasswd file as a secured storage
 
 ## Examples
 
@@ -49,6 +49,25 @@ ws2connect --tls /ws:example.com:9823
 ```bash
 ws2connect --dynamic /dynamic/ /ws:example.com:9823 /another-ws:host:9912
 ```
+
+* Basic authorization
+
+```bash
+# Create httpasswd file by standard utilities (for ubuntu: sudo apt install apache2-utils)
+# Initial file should be created with -c flag
+htpasswd -c -B -b auth admin adminPassword
+# Add more users (without -c)
+htpasswd -B -b auth guest guestPassword
+# Start ws2connect with basic authroization and other flags
+ws2connect -k basic -p auth /ws:example.com:9823
+```
+
+where:
+
+  * `-c` -  creates new file for passwords
+  * `-B` - use bcrypt to hash password, so even if file will be stolen no one can recover passwords
+  * `-b` - read password from command line argument. Good for example but for safety remove the flag and use STDIN as source of password
+  * `auth` - file name for passwords
 
 ## Usage
 
