@@ -22,7 +22,7 @@ jobs:
       - name: Install snapcraft
         run: |
           sudo apt-get install -y snapcraft
-          sudo snap install goreleaser --channel=0.123.3/stable --classic
+          sudo snap install goreleaser --classic
       - name: Run GoReleaser
         env:
           SNAP_TOKEN: ${{ secrets.SNAP_TOKEN }}
