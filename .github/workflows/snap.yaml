@@ -24,7 +24,7 @@ jobs:
           SNAP_TOKEN: ${{ secrets.SNAP_TOKEN }}
         run: |
           sudo apt-get install -y snapcraft
-          echo "{{SNAP_TOKEN}}" | snapcraft login --with -
+          echo "${SNAP_TOKEN}" | snapcraft login --with -
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v1
         with:
