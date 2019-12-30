@@ -31,4 +31,4 @@ jobs:
         uses: goreleaser/goreleaser-action@v1
         with:
           version: latest
-          args: -f .goreleaser.edge.yml --rm-dist
+          args: release -f .goreleaser.edge.yml --rm-dist
