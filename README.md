@@ -102,6 +102,7 @@ where:
 
 [![Download](https://api.bintray.com/packages/reddec/ws2connect-debian/ws2connect/images/download.svg)](https://bintray.com/reddec/ws2connect-debian/ws2connect/_latestVersion)
 
+* [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/ws2connect)
 * From [releases](https://github.com/reddec/ws2connect/releases) page
 * From bintray repository for most debian-based distribution (trusty, xenial, bionic, buster, wheezy):
 
