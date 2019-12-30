@@ -7,7 +7,6 @@ import (
 	"github.com/foomo/htpasswd"
 	"github.com/jessevdk/go-flags"
 	"github.com/reddec/ws2connect/server"
-	"github.com/rs/cors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -26,7 +25,6 @@ var config struct {
 	CertFile         string        `long:"cert-file" env:"CERT_FILE" description:"Path to certificate for TLS" default:"server.crt"`
 	KeyFile          string        `long:"key-file" env:"KEY_FILE" description:"Path to private key for TLS" default:"server.key"`
 	Quiet            bool          `short:"q" long:"quiet" env:"QUIET" description:"Disable logging"`
-	CORS             bool          `long:"cors" env:"CORS" description:"Enable CORS for HTTP server"`
 	Dynamic          string        `short:"d" long:"dynamic" env:"DYNAMIC" description:"Dynamic endpoint mapping path"`
 	Authorization    struct {
 		Kind     string `short:"k" long:"kind" env:"KIND" description:"Authorization kind" default:"none" choice:"none" choice:"basic" choice:"digest"`
@@ -87,10 +85,6 @@ func run() error {
 		}
 		handler = wrapped
 	}
-	if config.CORS {
-		handler = cors.AllowAll().Handler(handler)
-	}
-
 	srv := http.Server{
 		Addr:    config.Binding,
 		Handler: handler,
