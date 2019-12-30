@@ -26,7 +26,7 @@ var config struct {
 	CORS             bool          `long:"cors" env:"CORS" description:"Enable CORS for HTTP server"`
 	Dynamic          string        `short:"d" long:"dynamic" env:"DYNAMIC" description:"Dynamic endpoint mapping path"`
 	Args             struct {
-		Endpoint map[string]string `positional-arg-name:"endpoints" env:"ENDPOINT" description:"Endpoint mapping (/path:address)" default:"/:127.0.0.1:12345" env-delim:";" required:"yes"`
+		Endpoint map[string]string `positional-arg-name:"endpoints" env:"ENDPOINT" description:"Endpoint mapping (/path:address)" default:"/:127.0.0.1:12345" env-delim:";"`
 	} `positional-args:"yes"`
 }
 
