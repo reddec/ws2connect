@@ -24,6 +24,7 @@ var config struct {
 	KeyFile          string        `long:"key-file" env:"KEY_FILE" description:"Path to private key for TLS" default:"server.key"`
 	Quiet            bool          `short:"q" long:"quiet" env:"QUIET" description:"Disable logging"`
 	CORS             bool          `long:"cors" env:"CORS" description:"Enable CORS for HTTP server"`
+	Dynamic          string        `short:"d" long:"dynamic" env:"DYNAMIC" description:"Dynamic endpoint mapping path"`
 	Args             struct {
 		Endpoint map[string]string `positional-arg-name:"endpoints" env:"ENDPOINT" description:"Endpoint mapping (/path:address)" default:"/:127.0.0.1:12345" env-delim:";" required:"yes"`
 	} `positional-args:"yes"`
@@ -66,9 +67,15 @@ func run() error {
 		handler = cors.AllowAll().Handler(handler)
 	}
 
+	mux := http.NewServeMux()
+	mux.Handle("/", handler)
+	if config.Dynamic != "" {
+		mux.Handle(config.Dynamic, http.StripPrefix(config.Dynamic, handler))
+	}
+
 	srv := http.Server{
 		Addr:    config.Binding,
-		Handler: handler,
+		Handler: mux,
 	}
 	log.Println("server started on", config.Binding)
 	go func() {

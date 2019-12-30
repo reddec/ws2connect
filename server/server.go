@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -30,15 +31,15 @@ func (c Config) Create() http.Handler {
 	for _, ep := range c.Endpoints {
 		mux.HandleFunc(ep.Path, func(writer http.ResponseWriter, request *http.Request) {
 			log.Println("incoming request from", request.RemoteAddr, "will be mapped to", ep.Address, "(", ep.Protocol, ")")
-			c.makeProxy(ep, writer, request)
+			makeProxy(ep, c.Timeout, writer, request)
 		})
 	}
 	return mux
 }
 
-func (c Config) makeProxy(ep Endpoint, writer http.ResponseWriter, request *http.Request) {
+func makeProxy(ep Endpoint, timeout time.Duration, writer http.ResponseWriter, request *http.Request) {
 	defer request.Body.Close()
-	conn, err := ep.dial(c.Timeout)
+	conn, err := ep.dial(timeout)
 	if err != nil {
 		log.Println("connection failed to remote address", ep.Address, "(", ep.Protocol, "):", err)
 		http.Error(writer, "failed to connect", http.StatusBadGateway)
@@ -75,4 +76,35 @@ func (ep Endpoint) dial(timeout time.Duration) (net.Conn, error) {
 		return tls.DialWithDialer(dialer, "tcp", ep.Address, &tls.Config{RootCAs: pool})
 	}
 	return net.DialTimeout(ep.Protocol, ep.Address, timeout)
+}
+
+// Dynamic configuration for HTTP WS reverse proxy to multiple backend.
+//
+// Mapping to /<address:port>/<protocol:tls|tcp|udp>
+//
+type DynamicConfig struct {
+	Timeout time.Duration // connection timeout
+}
+
+// Create HTTP handler with dynamic mapping to remote addresses
+func (c DynamicConfig) Create() http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+
+		parts := strings.Split(request.URL.Path, "/")
+		if len(parts) != 2 {
+			http.Error(writer, "expected path /<address>/<protocol> but got "+request.URL.Path, http.StatusBadRequest)
+			return
+		}
+
+		address, protocol := parts[0], parts[1]
+
+		log.Println("incoming request from", request.RemoteAddr, "will be mapped to", address, "(", protocol, ")")
+
+		makeProxy(Endpoint{
+			Address:  address,
+			Protocol: protocol,
+		}, c.Timeout, writer, request)
+	})
+	return mux
 }
