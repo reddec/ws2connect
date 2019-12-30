@@ -100,8 +100,11 @@ where:
 
 ### Binary
 
+[![Download](https://api.bintray.com/packages/reddec/ws2connect-debian/ws2connect/images/download.svg)](https://bintray.com/reddec/ws2connect-debian/ws2connect/_latestVersion)
+
 * From [releases](https://github.com/reddec/ws2connect/releases) page
 * From bintray repository for most debian-based distribution (trusty, xenial, bionic, buster, wheezy):
+
 ```bash
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61
 echo "deb https://dl.bintray.com/reddec/ws2connect-debian {distribution} main" | sudo tee -a /etc/apt/sources.list
