@@ -57,25 +57,28 @@ func run() error {
 		log.Println(path, "->", addr, "(tcp)")
 	}
 
-	cfg := server.Config{
-		Endpoints: eps,
-		Timeout:   config.Timeout,
+	mux := http.NewServeMux()
+
+	if len(eps) > 0 {
+		cfg := server.Config{
+			Endpoints: eps,
+			Timeout:   config.Timeout,
+		}
+		mux.Handle("/", cfg.Create())
+	}
+	if config.Dynamic != "" {
+		cfg := server.DynamicConfig{Timeout: config.Timeout}
+		mux.Handle(config.Dynamic, http.StripPrefix(config.Dynamic, cfg.Create()))
 	}
 
-	var handler = cfg.Create()
+	var handler http.Handler = mux
 	if config.CORS {
 		handler = cors.AllowAll().Handler(handler)
 	}
 
-	mux := http.NewServeMux()
-	mux.Handle("/", handler)
-	if config.Dynamic != "" {
-		mux.Handle(config.Dynamic, http.StripPrefix(config.Dynamic, handler))
-	}
-
 	srv := http.Server{
 		Addr:    config.Binding,
-		Handler: mux,
+		Handler: handler,
 	}
 	log.Println("server started on", config.Binding)
 	go func() {

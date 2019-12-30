@@ -88,8 +88,7 @@ type DynamicConfig struct {
 
 // Create HTTP handler with dynamic mapping to remote addresses
 func (c DynamicConfig) Create() http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 
 		parts := strings.Split(request.URL.Path, "/")
 		if len(parts) != 2 {
@@ -106,5 +105,4 @@ func (c DynamicConfig) Create() http.Handler {
 			Protocol: protocol,
 		}, c.Timeout, writer, request)
 	})
-	return mux
 }
