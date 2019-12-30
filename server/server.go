@@ -1,6 +1,8 @@
 package server
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"golang.org/x/net/websocket"
 	"io"
 	"log"
@@ -36,7 +38,7 @@ func (c Config) Create() http.Handler {
 
 func (c Config) makeProxy(ep Endpoint, writer http.ResponseWriter, request *http.Request) {
 	defer request.Body.Close()
-	conn, err := net.DialTimeout(ep.Protocol, ep.Address, c.Timeout)
+	conn, err := ep.dial(c.Timeout)
 	if err != nil {
 		log.Println("connection failed to remote address", ep.Address, "(", ep.Protocol, "):", err)
 		http.Error(writer, "failed to connect", http.StatusBadGateway)
@@ -58,4 +60,19 @@ func (c Config) makeProxy(ep Endpoint, writer http.ResponseWriter, request *http
 		<-done
 	}).ServeHTTP(writer, request)
 	log.Println("connection", request.RemoteAddr, "->", ep.Address, "(", ep.Protocol, ")", "closed")
+}
+
+func (ep Endpoint) dial(timeout time.Duration) (net.Conn, error) {
+	if ep.Protocol == "tls" {
+		pool, err := x509.SystemCertPool()
+		if err != nil {
+			return nil, err
+		}
+		dialer := &net.Dialer{
+			Timeout:   timeout,
+			KeepAlive: 1,
+		}
+		return tls.DialWithDialer(dialer, "tcp", ep.Address, &tls.Config{RootCAs: pool})
+	}
+	return net.DialTimeout(ep.Protocol, ep.Address, timeout)
 }
