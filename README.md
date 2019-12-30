@@ -43,6 +43,12 @@ ws2connect -b 0.0.0.0:8888 /ws:example.com:9823
 ws2connect --tls /ws:example.com:9823
 ```
 
+* Dynamic and static endpoint mapping together
+
+```bash
+ws2connect --dynamic /dynamic/ /ws:example.com:9823 /another-ws:host:9912
+```
+
 ## Usage
 
     Usage:
@@ -57,6 +63,7 @@ ws2connect --tls /ws:example.com:9823
           --key-file=          Path to private key for TLS (default: server.key) [$KEY_FILE]
       -q, --quiet              Disable logging [$QUIET]
           --cors               Enable CORS for HTTP server [$CORS]
+      -d, --dynamic=           Dynamic endpoint mapping path [$DYNAMIC]
     
     Help Options:
       -h, --help               Show this help message
