@@ -75,21 +75,25 @@ where:
       ws2connect [OPTIONS] [endpoints]
     
     Application Options:
-      -b, --binding=           HTTP binding address (default: :8080) [$BINDING]
-      -t, --timeout=           Backend connection timeout (default: 15s) [$TIMEOUT]
-          --graceful-shutdown= Delay before server shutdown (default: 15s) [$GRACEFUL_SHUTDOWN]
-          --tls                Enable HTTPS serving with TLS [$TLS]
-          --cert-file=         Path to certificate for TLS (default: server.crt) [$CERT_FILE]
-          --key-file=          Path to private key for TLS (default: server.key) [$KEY_FILE]
-      -q, --quiet              Disable logging [$QUIET]
-          --cors               Enable CORS for HTTP server [$CORS]
-      -d, --dynamic=           Dynamic endpoint mapping path [$DYNAMIC]
+      -b, --binding=                      HTTP binding address (default: :8080) [$BINDING]
+      -t, --timeout=                      Backend connection timeout (default: 15s) [$TIMEOUT]
+          --graceful-shutdown=            Delay before server shutdown (default: 15s) [$GRACEFUL_SHUTDOWN]
+          --tls                           Enable HTTPS serving with TLS [$TLS]
+          --cert-file=                    Path to certificate for TLS (default: server.crt) [$CERT_FILE]
+          --key-file=                     Path to private key for TLS (default: server.key) [$KEY_FILE]
+      -q, --quiet                         Disable logging [$QUIET]
+      -d, --dynamic=                      Dynamic endpoint mapping path [$DYNAMIC]
+    
+    Authorization:
+      -k, --auth.kind=[none|basic|digest] Authorization kind (default: none) [$AUTH_KIND]
+          --auth.realm=                   Name of authorization zone (default: Restricted zone) [$AUTH_REALM]
+      -p, --auth.htpasswd=                Path to htpasswd (bcrypt or sha) file for user authorization [$AUTH_HTPASSWD]
     
     Help Options:
-      -h, --help               Show this help message
+      -h, --help                          Show this help message
     
     Arguments:
-      endpoints:               Endpoint mapping (/path:address)
+      endpoints:                          Endpoint mapping (/path:address)
 
 
 ## Installation
