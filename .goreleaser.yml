@@ -43,6 +43,28 @@ nfpms:
     formats:
       - deb
       - rpm
+snapcrafts:
+  - name: ws2connect
+    publish: true
+    summary: CLI to expose TCP/TLS/UDP/UNIX service over websocket
+    grade: stable
+    confinement: strict
+    base: core
+    license: MPL-2.0
+    description: |
+      Expose any TCP service over websocket. Heavily inspired by socat and websocketd.
+
+      * Single binary
+      * Few resource consumption
+      * Blazing fast
+      * Supports multiple endpoints with multiple mappings
+      * Supports dynamic and static endpoint mappings
+      * Supports TLS (HTTPS) serving
+      * Optional Basic or Digest authorization with encrypted (bcrypt or sha) httpasswd file as a secured storage
+    apps:
+      ws2connect:
+        plugs: ['home', 'network', 'personal-files']
+
 checksum:
   name_template: 'checksums.txt'
 snapshot:

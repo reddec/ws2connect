@@ -1,0 +1,32 @@
+name: Deploy edge to snapcraft
+on:
+  push:
+    branches:
+      - master
+    tags-ignore:
+      - 'v*'
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+      - name: Install snapcraft and login
+        env:
+          SNAP_TOKEN: ${{ secrets.SNAP_TOKEN }}
+        run: |
+          sudo apt-get install -y snapcraft
+          echo "{{SNAP_TOKEN}}" | snapcraft login --with -
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v1
+        with:
+          version: latest
+          args: -f .goreleaser.edge.yml --rm-dist
