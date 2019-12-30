@@ -10,11 +10,7 @@ builds:
       - arm64
     goos:
       - linux
-      - windows
-      - darwin
-      - freebsd
     goarm:
-      - 5
       - 6
       - 7
     flags:
