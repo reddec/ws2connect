@@ -28,4 +28,5 @@ jobs:
           SNAP_TOKEN: ${{ secrets.SNAP_TOKEN }}
         run: |
           echo "${SNAP_TOKEN}" | snapcraft login --with -
-          goreleaser release -f .goreleaser.edge.yml --rm-dist
+          goreleaser --snapshot -f .goreleaser.edge.yml --rm-dist
+          snapcraft push --release=devel dist/*.snap
